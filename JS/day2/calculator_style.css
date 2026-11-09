@@ -1,0 +1,171 @@
+/* =========================================================
+   계산기 스타일 (JavaScript 2일차)
+   콘셉트: 책상 위의 탁상 계산기 - 어두운 몸체, 녹색 LCD 화면, 역할별 색이 다른 버튼
+   ========================================================= */
+
+:root {
+    --page: #DCE1DE;        /* 페이지 배경 */
+    --body: #2B2F2E;        /* 계산기 몸체 */
+    --lcd: #C3CFB4;         /* LCD 화면 */
+    --lcd-off: #8E9984;     /* 전원이 꺼진 LCD */
+    --lcd-ink: #1D271D;     /* LCD 글자 */
+    --key: #EFECE4;         /* 숫자 버튼 */
+    --key-ink: #2B2F2E;
+    --operator: #E2A63B;    /* 연산자 버튼 */
+    --enter: #3E7C5A;       /* 계산(Enter) 버튼 */
+    --clear: #B8434F;       /* 지우기(C) 버튼 */
+    --power: #59625E;       /* 전원 버튼 */
+}
+
+* {
+    box-sizing: border-box;     /* 너비 계산에 padding과 border를 포함 (크기 계산이 쉬워짐) */
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;        /* 계산기를 화면 정가운데에 */
+    padding: 16px;
+    background-color: var(--page);
+    font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+}
+
+/* ---------- 몸체 ---------- */
+.calculator {
+    width: min(340px, 100%);    /* 최대 340px, 화면이 더 좁으면 화면 폭에 맞춤 */
+    padding: 22px;
+    border-radius: 24px;
+    background-color: var(--body);
+    box-shadow: inset 0 1px 0 #3D4442, 0 18px 40px rgba(20, 30, 25, 0.35);
+}
+
+/* ---------- LCD 화면 ---------- */
+.screen {
+    margin-bottom: 18px;
+    padding: 10px 14px 8px;
+    border-radius: 10px;
+    background-color: var(--lcd);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.28);    /* 안쪽 그림자로 화면이 움푹 들어간 느낌 */
+    transition: background-color 0.3s;
+}
+
+.history {
+    min-height: 1.4em;          /* 내용이 없어도 높이를 유지해 화면이 들썩이지 않게 */
+    margin: 0;
+    font-family: "Share Tech Mono", ui-monospace, monospace;
+    font-size: 0.95rem;
+    color: rgba(29, 39, 29, 0.65);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;    /* 너무 길면 ... 으로 줄임 */
+}
+
+#display {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-family: "Share Tech Mono", ui-monospace, monospace;
+    font-size: 2.4rem;
+    color: var(--lcd-ink);
+    text-align: right;
+}
+
+/* ---------- 버튼 배치: 4칸짜리 격자(grid) ---------- */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* 같은 너비의 4칸 */
+    gap: 10px;
+}
+
+button {
+    height: 58px;
+    border: 0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);              /* 버튼 아래 그림자 = 튀어나온 키 */
+    transition: transform 60ms, box-shadow 60ms, opacity 0.2s;
+}
+
+/* 누르는 순간: 살짝 내려가고 그림자가 줄어 '눌린' 느낌 */
+button:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* 키보드로 이동할 때 현재 버튼이 잘 보이게 */
+button:focus-visible {
+    outline: 3px solid #F4F7F5;
+    outline-offset: 2px;
+}
+
+.number {
+    background-color: var(--key);
+    color: var(--key-ink);
+}
+
+.operator {
+    background-color: var(--operator);
+    color: #2A1D05;
+    font-size: 1.6rem;
+}
+
+.clear {
+    background-color: var(--clear);
+    color: #FFFFFF;
+}
+
+.enter {
+    grid-column: span 2;        /* 2칸 차지 */
+    background-color: var(--enter);
+    color: #FFFFFF;
+}
+
+.on-off {
+    grid-column: span 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--power);
+    color: #E7ECE9;
+    font-size: 1rem;
+}
+
+/* 전원 표시등 */
+.led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #7CF29A;
+    box-shadow: 0 0 6px #7CF29A;
+}
+
+/* ---------- 전원이 꺼졌을 때 (JS가 .calculator에 is-off 클래스를 붙임) ---------- */
+.is-off .screen {
+    background-color: var(--lcd-off);
+}
+
+.is-off .led {
+    background-color: #3B423F;
+    box-shadow: none;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.hint {
+    margin: 16px 0 0;
+    color: #AEB8B3;
+    font-size: 0.8rem;
+    text-align: center;
+    word-break: keep-all;
+}

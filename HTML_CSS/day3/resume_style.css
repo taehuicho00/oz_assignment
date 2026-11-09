@@ -1,0 +1,521 @@
+/* =========================================================
+   조태희 이력서 스타일 (HTML/CSS 3일차)
+   - Bootstrap 5를 먼저 불러오고, 이 파일에서 색·글꼴·배치를 덮어씁니다.
+   - 순서: 1) 디자인 변수  2) 기본 글자  3) 머리말  4) 프로필
+           5) 본문 섹션  6) 이력 표(반응형)  7) 폼  8) 바닥글  9) 접근성·인쇄
+   ========================================================= */
+
+
+/* ---------- 1) 디자인 변수 ----------
+   자주 쓰는 색과 글꼴을 변수(--이름)로 모아 두면 한 곳만 고쳐도 전체가 바뀝니다.
+   색 이름은 '양평 두물머리의 새벽 강'에서 따왔습니다. */
+:root {
+    --mist: #EEF2EF;        /* 물안개: 머리말·프로필 배경 */
+    --paper: #FFFFFF;       /* 종이: 본문 배경 */
+    --ink: #17323A;         /* 깊은 물: 제목 글자 */
+    --body: #33464C;        /* 본문 글자 */
+    --reed: #5F716C;        /* 갈대: 보조 글자 */
+    --river: #2C7A7B;       /* 강: 링크·포인트 색 */
+    --river-deep: #1F5E60;  /* 진한 강: 버튼에 마우스를 올렸을 때 */
+    --lotus: #C2547A;       /* 연꽃: 두 물줄기가 만나는 점 하나에만 사용 */
+    --line: #D6DFDB;        /* 얇은 구분선 */
+
+    --font-heading: "Hahmlet", "Noto Serif KR", serif;
+    --font-body: "IBM Plex Sans KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+
+    /* Bootstrap이 내부에서 쓰는 변수를 내 값으로 바꾸기 (Bootstrap 5.3은 CSS 변수로 꾸밀 수 있음) */
+    --bs-body-font-family: var(--font-body);
+    --bs-body-color: var(--body);
+    --bs-body-bg: var(--paper);
+    --bs-body-line-height: 1.75;            /* 한글은 줄 간격이 넉넉해야 읽기 편함 */
+    --bs-border-color: var(--line);
+    --bs-link-color-rgb: 44, 122, 123;      /* --river 색을 숫자(R, G, B)로 쓴 것 */
+    --bs-link-hover-color-rgb: 31, 94, 96;  /* --river-deep */
+}
+
+
+/* ---------- 2) 기본 글자 ---------- */
+body {
+    word-break: keep-all;       /* 한국어 단어가 줄 끝에서 중간에 끊기지 않게 */
+    overflow-wrap: break-word;  /* 대신 아주 긴 영어·주소는 넘치지 않도록 줄바꿈 허용 */
+}
+
+h1, h2, h3 {
+    font-family: var(--font-heading);
+    color: var(--ink);
+}
+
+
+/* ---------- 3) 머리말 ---------- */
+.site-header {
+    background-color: var(--mist);
+    padding: 3.5rem 0 3rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.name {
+    /* clamp(최소, 기본, 최대): 화면 폭에 따라 글자 크기가 자연스럽게 커지고 작아짐 */
+    font-size: clamp(2.75rem, 2rem + 4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+}
+
+.headline {
+    font-size: 1.125rem;
+    max-width: 34em;  /* 한 줄이 너무 길면 읽기 힘들어서 폭을 제한 */
+    margin: 0;
+}
+
+/* 두 물줄기가 합쳐지는 그림 */
+.confluence {
+    margin: 0;
+}
+
+.confluence svg {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+    margin-left: auto;   /* 넓은 화면에서는 오른쪽에 붙임 */
+    overflow: visible;
+}
+
+.stream,
+.river {
+    fill: none;
+    stroke-linecap: round;
+}
+
+.stream {
+    stroke-width: 3;
+}
+
+.stream-top {
+    stroke: #93B4AD;          /* 사업 운영: 옅은 물빛 */
+}
+
+.stream-bottom {
+    stroke: var(--river);     /* 개발 공부: 강 색 */
+}
+
+.river {
+    stroke: var(--river-deep);
+    stroke-width: 6;          /* 합쳐진 뒤에는 물줄기가 더 굵어짐 */
+}
+
+.meet {
+    fill: var(--lotus);
+}
+
+.label {
+    font-family: var(--font-body);
+    font-size: 14px;          /* 그림 크기에 맞춰 함께 줄어들므로 조금 크게 */
+    fill: var(--reed);
+}
+
+.label-river {
+    fill: var(--river-deep);
+    font-weight: 600;
+}
+
+/* 페이지를 열 때 한 번만 선이 그려지는 애니메이션.
+   '움직임 줄이기'를 설정한 사용자에게는 실행하지 않음 (prefers-reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+    .stream,
+    .river {
+        stroke-dasharray: 1;      /* pathLength="1"이라 선 전체 길이 = 1 */
+        stroke-dashoffset: 1;     /* 처음에는 선이 전부 숨겨진 상태 */
+        animation: draw 0.9s ease-out forwards;
+    }
+
+    .river {
+        animation-delay: 0.8s;    /* 두 물줄기가 다 그려진 뒤 합쳐진 강이 이어짐 */
+    }
+
+    .meet {
+        transform-box: fill-box;
+        transform-origin: center;
+        transform: scale(0);
+        animation: pop 0.35s ease-out 0.75s forwards;
+    }
+}
+
+@keyframes draw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes pop {
+    to { transform: scale(1); }
+}
+
+
+/* ---------- 4) 프로필 (왼쪽 영역) ---------- */
+.page {
+    padding-top: 2.5rem;
+    padding-bottom: 3rem;
+}
+
+.profile {
+    background-color: var(--mist);
+    border-radius: 12px;
+    padding: 1.75rem;
+}
+
+/* 992px 이상(데스크톱)에서는 스크롤해도 프로필이 화면에 붙어 있도록 */
+@media (min-width: 992px) {
+    .profile {
+        position: sticky;
+        top: 1.5rem;
+    }
+}
+
+/* 768~991px(태블릿): 프로필이 한 줄을 다 쓰므로 두 덩어리를 좌우로 나란히 */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .profile {
+        display: grid;
+        grid-template-columns: 1fr 1fr;   /* 같은 너비 2칸 */
+        column-gap: 2.5rem;
+    }
+
+    /* 오른쪽 칸의 첫 제목은 위쪽 여백을 없애 왼쪽 칸과 높이를 맞춤 */
+    .profile-part > .profile-title:first-child {
+        margin-top: 0;
+    }
+}
+
+.profile-photo {
+    display: block;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;           /* 정사각형 이미지를 원으로 */
+    border: 3px solid var(--paper);
+    margin-bottom: 0.5rem;
+}
+
+.profile-title {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.info-list {
+    list-style: none;   /* 글머리 기호(점) 없애기 */
+    padding: 0;
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+.info-list li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.info-key {
+    display: block;     /* 항목 이름을 값 위에 한 줄로 */
+    font-size: 0.8125rem;
+    color: var(--reed);
+}
+
+.skills {
+    margin: 0;
+}
+
+.skills dt {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--reed);
+    margin-top: 0.75rem;
+}
+
+.skills dd {
+    display: flex;      /* 기술 이름들을 가로로 나열하고 */
+    flex-wrap: wrap;    /* 자리가 모자라면 다음 줄로 */
+    gap: 0.375rem;
+    margin: 0.35rem 0 0;
+}
+
+.skill {
+    font-size: 0.8125rem;
+    padding: 0.1rem 0.55rem;
+    border: 1px solid #BFD0CB;
+    border-radius: 6px;
+    background-color: var(--paper);
+    color: var(--ink);
+}
+
+.github-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-weight: 600;
+}
+
+.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9375rem;
+}
+
+.toc a {
+    color: var(--body);
+    text-decoration: none;
+}
+
+.toc a:hover {
+    color: var(--river);
+    text-decoration: underline;
+}
+
+
+/* ---------- 5) 본문 섹션 ---------- */
+.resume-section {
+    padding: 2rem 0;
+    border-top: 1px solid var(--line);
+}
+
+.resume-section:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.resume-section h2 {
+    font-size: 1.625rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+.resume-section p {
+    max-width: 38em;    /* 한글 기준 한 줄 약 38자: 눈이 편한 길이 */
+}
+
+/* 일하는 방식: ol의 기본 번호 대신 CSS counter로 큰 번호를 만듦 */
+.steps {
+    list-style: none;
+    counter-reset: step;        /* step이라는 숫자 세기를 0부터 시작 */
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.25rem;
+}
+
+.steps li {
+    counter-increment: step;    /* li가 나올 때마다 1씩 증가 */
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    column-gap: 0.75rem;
+}
+
+.steps li::before {
+    content: counter(step);     /* 현재 숫자를 글자로 표시 */
+    grid-row: span 2;
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    line-height: 1.2;
+    color: var(--river);
+}
+
+.steps strong {
+    display: block;
+    color: var(--ink);
+    font-weight: 600;
+}
+
+/* 768px 이상에서는 2단으로 배치 */
+@media (min-width: 768px) {
+    .steps {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem 2rem;
+    }
+}
+
+
+/* ---------- 6) 이력 표 (반응형) ---------- */
+.history-table {
+    --bs-table-bg: transparent;     /* Bootstrap 표의 배경을 투명하게 */
+    caption-side: top;              /* 표 제목을 표 위에 */
+    margin-bottom: 0;
+    font-size: 0.9375rem;
+}
+
+.history-table caption {
+    padding-top: 0;
+    color: var(--reed);
+    font-size: 0.875rem;
+}
+
+.history-table thead th {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--reed);
+    white-space: nowrap;
+    border-bottom: 2px solid var(--ink);
+}
+
+.history-table tbody th,
+.history-table td {
+    padding: 0.9rem 0.6rem;
+    vertical-align: top;
+}
+
+.history-table tbody th {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* 767px 이하(휴대폰): 표를 '카드처럼 쌓인 목록'으로 바꿈 */
+@media (max-width: 767.98px) {
+    /* 머리글 줄은 화면에서만 숨김 (화면 낭독기는 계속 읽을 수 있게) */
+    .history-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    /* 표 요소들을 일반 블록처럼 위아래로 쌓기 */
+    .history-table,
+    .history-table tbody,
+    .history-table tr,
+    .history-table tbody th,
+    .history-table td {
+        display: block;
+        width: 100%;
+    }
+
+    /* 표가 블록이 되면 제목(caption)이 좁게 줄어들어 한 단어씩 끊기므로 한 줄 전체를 쓰게 함 */
+    .history-table caption {
+        display: block;
+    }
+
+    .history-table tr {
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .history-table tbody th {
+        font-size: 1.0625rem;
+        padding: 0 0 0.5rem;
+        border: 0;
+    }
+
+    .history-table td {
+        display: grid;
+        grid-template-columns: 5.5rem 1fr;  /* 왼쪽: 항목 이름, 오른쪽: 내용 */
+        gap: 0.5rem;
+        padding: 0.2rem 0;
+        border: 0;
+    }
+
+    /* data-label 속성 값을 각 칸 앞에 글자로 보여줌 */
+    .history-table td::before {
+        content: attr(data-label);
+        font-size: 0.8125rem;
+        color: var(--reed);
+    }
+}
+
+
+/* ---------- 7) 메일 폼 ---------- */
+.section-note {
+    color: var(--reed);
+    font-size: 0.9375rem;
+}
+
+.contact-form .form-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.contact-form .form-control {
+    border-color: #BFD0CB;
+    padding: 0.65rem 0.85rem;
+}
+
+.contact-form .form-control:focus {
+    border-color: var(--river);
+    box-shadow: 0 0 0 0.2rem rgba(44, 122, 123, 0.2);
+}
+
+/* Bootstrap 버튼은 --bs-btn-* 변수로 색을 바꿀 수 있음 */
+.btn-send {
+    --bs-btn-bg: var(--river);
+    --bs-btn-color: #FFFFFF;
+    --bs-btn-border-color: var(--river);
+    --bs-btn-hover-bg: var(--river-deep);
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-border-color: var(--river-deep);
+    --bs-btn-active-bg: var(--river-deep);
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-focus-shadow-rgb: 44, 122, 123;
+    padding: 0.7rem 1.4rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+
+/* ---------- 8) 바닥글 ---------- */
+.site-footer {
+    border-top: 1px solid var(--line);
+    padding: 1.5rem 0 2rem;
+    color: var(--reed);
+    font-size: 0.875rem;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+
+/* ---------- 9) 접근성·반응형 보정·인쇄 ---------- */
+/* 키보드로 이동할 때 현재 위치가 잘 보이도록 */
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--river);
+    outline-offset: 2px;
+}
+
+/* '본문 바로가기' 링크가 나타났을 때의 모양 */
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 10;
+    padding: 0.5rem 0.9rem;
+    border-radius: 6px;
+    background-color: var(--ink);
+    color: #FFFFFF;
+}
+
+/* 767px 이하: 머리말 여백을 줄이고 그림을 왼쪽 정렬 */
+@media (max-width: 767.98px) {
+    .site-header {
+        padding: 2.25rem 0 2rem;
+    }
+
+    .confluence svg {
+        margin-left: 0;
+    }
+}
+
+/* 인쇄(PDF 저장)할 때는 꾸밈 요소와 폼을 빼고 내용만 */
+@media print {
+    .site-header,
+    .profile {
+        background: none;
+    }
+
+    .confluence,
+    .toc,
+    .github-link,
+    #contact {
+        display: none;
+    }
+}

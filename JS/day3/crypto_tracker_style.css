@@ -1,0 +1,296 @@
+/* =========================================================
+   실시간 코인 시세 스타일 (JavaScript 3일차)
+   콘셉트: 시세 '장부' - 녹색 괘선, 머리글 아래 이중선, 빨간/파란 잉크
+   한국 시세 표기 관례대로 상승은 빨강, 하락은 파랑을 씁니다.
+   ========================================================= */
+
+:root {
+    --paper: #F6F8F3;           /* 장부 종이 */
+    --rule: #D5E0D1;            /* 괘선 */
+    --ink: #1D2B24;             /* 기본 글자 */
+    --muted: #5E6D64;           /* 보조 글자 */
+    --ledger: #24402F;          /* 장부 표지의 진한 녹색 */
+    --up: #C8243A;              /* 상승: 빨간 잉크 */
+    --down: #1E5BC6;            /* 하락: 파란 잉크 */
+    --star: #C98E00;            /* 관심 별 */
+    --font: "IBM Plex Sans KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    word-break: keep-all;
+}
+
+.ledger {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 32px 16px 48px;
+}
+
+/* ---------- 제목 영역 ---------- */
+.ledger-header {
+    display: flex;
+    flex-wrap: wrap;                /* 좁은 화면에서는 상태 표시가 아래 줄로 */
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ledger);
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ledger);
+}
+
+.subtitle {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;     /* 숫자 폭을 같게 해서 시간이 바뀔 때 글자가 흔들리지 않게 */
+}
+
+.status-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #A3AFA7;              /* 기본(불러오는 중): 회색 */
+}
+
+/* JS가 data-state 값을 바꾸면 색이 바뀜 */
+.status[data-state="live"] .status-dot {
+    background-color: #2E9E5B;              /* 연결됨: 초록 */
+}
+
+.status[data-state="error"] {
+    color: var(--up);
+}
+
+.status[data-state="error"] .status-dot {
+    background-color: var(--up);            /* 오류: 빨강 */
+}
+
+/* ---------- 탭과 검색 ---------- */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+}
+
+.tabs {
+    display: inline-flex;
+    border: 1px solid var(--ledger);
+    border-radius: 8px;
+    overflow: hidden;                       /* 안쪽 버튼이 둥근 모서리 밖으로 나가지 않게 */
+}
+
+.tab {
+    padding: 8px 16px;
+    border: 0;
+    background: transparent;
+    color: var(--ledger);
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.tab + .tab {
+    border-left: 1px solid var(--ledger);   /* 두 탭 사이 구분선 */
+}
+
+.tab.is-active {
+    background-color: var(--ledger);
+    color: #FFFFFF;
+}
+
+.count {
+    margin-left: 4px;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+}
+
+.search {
+    position: relative;                     /* 돋보기 아이콘을 입력칸 안에 겹쳐 놓기 위한 기준 */
+    flex: 1 1 260px;
+    max-width: 360px;
+}
+
+.search svg {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    transform: translateY(-50%);
+    color: var(--muted);
+}
+
+.search input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;             /* 왼쪽은 아이콘 자리만큼 비움 */
+    border: 1px solid #BCCBB8;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: var(--ink);
+    font: inherit;
+}
+
+.search input:focus {
+    outline: 3px solid rgba(36, 64, 47, 0.25);
+    border-color: var(--ledger);
+}
+
+/* ---------- 시세 표 ---------- */
+.price-table {
+    width: 100%;
+    border-collapse: collapse;              /* 칸 사이 테두리를 한 줄로 합치기 */
+    font-variant-numeric: tabular-nums;     /* 숫자 폭을 같게 → 자릿수가 세로로 가지런히 정렬 */
+}
+
+.price-table thead th {
+    position: sticky;                       /* 스크롤해도 머리글이 위에 붙어 있음 */
+    top: 0;
+    z-index: 1;
+    padding: 10px 12px;
+    background-color: var(--paper);
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 3px double var(--ledger);    /* 장부처럼 머리글 아래 이중선 */
+}
+
+.price-table td,
+.price-table tbody th {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);   /* 장부 괘선 */
+    font-size: 0.95rem;
+}
+
+.price-table tbody th {
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.price-table tbody tr:hover {
+    background-color: #ECF2E8;
+}
+
+.price-table .num {
+    text-align: right;                      /* 숫자는 오른쪽 정렬해야 자릿수 비교가 쉬움 */
+    white-space: nowrap;
+}
+
+.quote {
+    margin-left: 2px;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 400;
+}
+
+.up {
+    color: var(--up);
+}
+
+.down {
+    color: var(--down);
+}
+
+.flat {
+    color: var(--muted);
+}
+
+/* ---------- 관심(별) 버튼 ---------- */
+.price-table .col-fav {
+    width: 44px;
+    padding-left: 4px;
+    padding-right: 4px;
+    text-align: center;
+}
+
+.fav-btn {
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #A3AFA7;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.fav-btn[aria-pressed="true"] {
+    color: var(--star);                     /* 관심 코인이면 금색 별 */
+}
+
+.fav-btn:hover {
+    background-color: rgba(201, 142, 0, 0.12);
+}
+
+.fav-btn:focus-visible,
+.tab:focus-visible {
+    outline: 3px solid rgba(36, 64, 47, 0.45);
+    outline-offset: 1px;
+}
+
+/* ---------- 안내 문구 ---------- */
+.empty {
+    margin: 0;
+    padding: 40px 16px;
+    color: var(--muted);
+    text-align: center;
+}
+
+/* 화면에서는 숨기고 화면 낭독기에는 읽히게 하는 클래스 */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------- 반응형: 640px 이하에서는 고가·저가·거래대금 칸을 숨김 ---------- */
+@media (max-width: 640px) {
+    .col-wide {
+        display: none;
+    }
+
+    .price-table td,
+    .price-table tbody th,
+    .price-table thead th {
+        padding: 10px 6px;
+    }
+
+    .search {
+        max-width: none;                    /* 검색창을 한 줄 전체로 */
+    }
+}

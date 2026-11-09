@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" role="img" aria-labelledby="avatar-title">
+  <!-- 실제 사진 대신 쓰는 기본 아바타입니다. 공개 저장소이므로 본인 사진은 올리지 않았습니다. -->
+  <title id="avatar-title">프로필 이미지 자리 (기본 아바타)</title>
+  <!-- 배경 -->
+  <rect width="320" height="320" fill="#DCE7E3"/>
+  <!-- 머리 -->
+  <circle cx="160" cy="126" r="54" fill="#2C7A7B"/>
+  <!-- 어깨 -->
+  <path d="M52 320c6-70 50-112 108-112s102 42 108 112z" fill="#2C7A7B"/>
+</svg>

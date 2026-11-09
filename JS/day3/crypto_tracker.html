@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 코인 시세 | JavaScript 3일차</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+    <link rel="stylesheet" href="crypto_tracker_style.css">
+</head>
+<body>
+    <div class="ledger">
+        <!-- ===== 제목과 연결 상태 ===== -->
+        <header class="ledger-header">
+            <div>
+                <h1>실시간 코인 시세</h1>
+                <p class="subtitle">바이낸스 USDT 마켓, 1초마다 자동 갱신</p>
+            </div>
+            <!-- role="status": 내용이 바뀌면 화면 낭독기가 읽어 줌 -->
+            <p class="status" id="status" role="status">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span id="statusText">시세를 불러오는 중입니다</span>
+            </p>
+        </header>
+
+        <!-- ===== 탭(전체/관심)과 검색 ===== -->
+        <div class="toolbar">
+            <div class="tabs" aria-label="보기 선택">
+                <!-- data-view: JS가 어떤 목록을 보여줄지 구분하는 값 / aria-pressed: 선택된 탭인지 -->
+                <button class="tab is-active" type="button" data-view="all" aria-pressed="true">
+                    전체 <span class="count" id="countAll">0</span>
+                </button>
+                <button class="tab" type="button" data-view="favorites" aria-pressed="false">
+                    관심 <span class="count" id="countFavorites">0</span>
+                </button>
+            </div>
+
+            <label class="search">
+                <span class="visually-hidden">코인 검색</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <input id="searchInput" type="search" placeholder="코인 검색 (예: BTC, ETH)" autocomplete="off">
+            </label>
+        </div>
+
+        <!-- ===== 시세 표: tbody 안의 행은 JS가 만들어 넣음 ===== -->
+        <table class="price-table">
+            <thead>
+                <tr>
+                    <th scope="col" class="col-fav"><span class="visually-hidden">관심</span></th>
+                    <th scope="col">코인</th>
+                    <th scope="col" class="num">현재가 (USDT)</th>
+                    <th scope="col" class="num">24시간 변동</th>
+                    <th scope="col" class="num col-wide">24시간 고가</th>
+                    <th scope="col" class="num col-wide">24시간 저가</th>
+                    <th scope="col" class="num col-wide">거래대금 (USDT)</th>
+                </tr>
+            </thead>
+            <tbody id="priceList"></tbody>
+        </table>
+
+        <!-- 불러오는 중, 검색 결과 없음, 관심 코인 없음 같은 안내 문구 -->
+        <p class="empty" id="emptyMessage">시세를 불러오는 중입니다.</p>
+    </div>
+
+    <script src="crypto_tracker.js"></script>
+</body>
+</html>

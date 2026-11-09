@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>콘솔 계산기 | JavaScript 1일차</title>
+    <style>
+        /* 안내 페이지라서 CSS는 이 파일 안에 간단히만 작성 */
+        body {
+            margin: 0;
+            background: #F3F5F4;
+            color: #22302B;
+            font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+        main {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 48px 16px 64px;
+        }
+        h1 {
+            font-size: 1.9rem;
+            margin: 0 0 8px;
+        }
+        h2 {
+            font-size: 1.15rem;
+            margin: 36px 0 8px;
+        }
+        .lead {
+            margin: 0;
+            color: #4D5D57;
+        }
+        kbd {
+            padding: 1px 6px;
+            border: 1px solid #B9C4BF;
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        pre {
+            margin: 8px 0 0;
+            padding: 16px;
+            border-radius: 10px;
+            background: #1F2A26;
+            color: #E4ECE8;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        .result {
+            color: #8FD3A8;   /* 콘솔에 출력되는 결과 줄 */
+        }
+        .error {
+            color: #F2A0A0;   /* 콘솔에 빨간 글씨로 나오는 에러 줄 */
+        }
+        ul {
+            padding-left: 1.3em;
+        }
+    </style>
+    <!-- 계산기 코드 연결: 페이지를 열면 콘솔에서 calc(), start()를 바로 쓸 수 있음 -->
+    <script src="calculator.js"></script>
+</head>
+<body>
+    <main>
+        <h1>콘솔 계산기</h1>
+        <p class="lead">이 페이지의 계산기는 화면이 아니라 브라우저의 <strong>Console(콘솔)</strong>에서 동작합니다.
+            곱셈·나눗셈을 덧셈·뺄셈보다 먼저 계산하고, 긴 계산식도 계산할 수 있습니다.</p>
+
+        <h2>1. 콘솔 열기</h2>
+        <ul>
+            <li>Windows: <kbd>F12</kbd> 또는 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>J</kbd></li>
+            <li>macOS: <kbd>Option</kbd> + <kbd>Command</kbd> + <kbd>J</kbd> (Chrome 기준)</li>
+        </ul>
+        <p>열린 창에서 <strong>Console</strong> 탭을 선택합니다.</p>
+
+        <h2>2. 한 번에 계산하기: calc("식")</h2>
+        <pre><code>&gt; calc("1 + 2 * 3")
+<span class="result">1 + 2 * 3 = 7</span>
+&gt; calc("10 - 4 / 2 * 3 + 1")
+<span class="result">10 - 4 / 2 * 3 + 1 = 5</span>
+&gt; calc("0.1 + 0.2")
+<span class="result">0.1 + 0.2 = 0.3</span>
+&gt; calc("7 / 0")
+<span class="error">계산할 수 없습니다: 0으로 나눌 수 없습니다.</span></code></pre>
+
+        <h2>3. 입력창으로 계속 계산하기: start()</h2>
+        <pre><code>&gt; start()</code></pre>
+        <p>입력창이 뜨면 계산식을 입력하고 확인을 누르세요. 결과가 콘솔에 출력되고 입력창이 다시 뜹니다.
+            <strong>취소</strong>를 누르면 끝납니다.</p>
+
+        <h2>입력 규칙</h2>
+        <ul>
+            <li>숫자와 <code>+ - * /</code>만 쓸 수 있습니다. 공백은 있어도 없어도 됩니다. (<code>1+2*3</code>도 가능)</li>
+            <li>음수와 소수도 됩니다. 예) <code>-3 + 2.5 * 4</code>, <code>2 * -5</code></li>
+            <li>0으로 나누기, 연산자로 끝나는 식(<code>5 +</code>), 연산자가 잘못 이어진 식(<code>1 + * 2</code>)은 계산하지 않고 이유를 알려 줍니다.</li>
+        </ul>
+    </main>
+</body>
+</html>
